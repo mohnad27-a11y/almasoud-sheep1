@@ -116,7 +116,7 @@
 
     if (!itemsBox || !totalBox || !link) {
       
-    }link.href = "https://wa.me/966506113217?text=" + encodeURIComponent(msg);
+   link.href = "https://wa.me/966506113217?text=" + encodeURIComponent(msg); 
 
     itemsBox.innerHTML = "";
 
