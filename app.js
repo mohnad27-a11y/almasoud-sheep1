@@ -115,8 +115,8 @@
       document.getElementById("orderLink");
 
     if (!itemsBox || !totalBox || !link) {
-      return;
-    }
+      
+    }link.href = "https://wa.me/966506113217?text=" + encodeURIComponent(msg);
 
     itemsBox.innerHTML = "";
 
