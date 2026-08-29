@@ -1,9 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:theme="@style/Theme.Almasoud"
         android:label="المسعود للأغنام"
+        android:theme="@style/Theme.Almasoud"
         android:usesCleartextTraffic="true">
 
         <activity
@@ -18,4 +19,5 @@
         </activity>
 
     </application>
+
 </manifest>
