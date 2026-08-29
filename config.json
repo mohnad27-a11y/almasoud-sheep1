@@ -1,0 +1,10 @@
+{
+  "company": "شركة المسعود للأغنام",
+  "branch": "قرية الفقهاء – جازان",
+  "service_area": ["صبيا", "جازان", "صامطة", "أبو عريش"],
+  "delivery": {"free_until_km": 20, "fee_after_km": 35},
+  "categories": ["بلدي", "حري", "تيوس", "طليان", "رخال"],
+  "payments": ["كاش عند الاستلام", "شبكة عند الاستلام", "بوابة دفع إلكتروني", "Apple Pay", "Samsung Pay", "مدى", "Visa", "Mastercard", "American Express", "Tabby", "Tamara"],
+  "excluded": ["المزاد الإلكتروني", "سوق المربين"],
+  "development_budget_target_sar": 2500
+}
