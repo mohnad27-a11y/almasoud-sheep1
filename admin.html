@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>إدارة شركة المسعود للأغنام</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f4f4;
+      color: #222;
+    }
+
+    header {
+      background: #198754;
+      color: white;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 15px;
+    }
+
+    .add-box,
+    .product-card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin: 7px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin: 4px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .add-btn {
+      background: #198754;
+      color: white;
+    }
+
+    .edit-btn {
+      background: #ffc107;
+      color: #222;
+    }
+
+    .delete-btn {
+      background: #dc3545;
+      color: white;
+    }
+
+    .product-name {
+      font-size: 19px;
+      font-weight: bold;
+    }
+
+    .product-price {
+      color: #198754;
+      font-size: 18px;
+      margin: 8px 0;
+    }
+
+    #message {
+      text-align: center;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h2>لوحة إدارة المسعود للأغنام</h2>
+</header>
+
+<div class="container">
+
+  <div class="add-box">
+    <h3>إضافة منتج جديد</h3>
+
+    <input
+      id="productName"
+      type="text"
+      placeholder="اسم المنتج"
+    />
+
+    <input
+      id="productPrice"
+      type="number"
+      placeholder="السعر"
+    />
+
+    <button
+      class="add-btn"
+      onclick="addProduct()"
+    >
+      إضافة المنتج
+    </button>
+  </div>
+
+  <div id="message"></div>
+
+  <h3>المنتجات</h3>
+
+  <div id="products"></div>
+
+</div>
+
+<script>
+
+const API_BASE =
+  window.ALMSOUD_API_BASE ||
+  "https://almasoud-sheep.onrender.com";
+
+async function loadProducts() {
+
+  const productsBox =
+    document.getElementById("products");
+
+  productsBox.innerHTML =
+    "جاري تحميل المنتجات...";
+
+  try {
+
+    const response =
+      await fetch(`${API_BASE}/products`);
+
+    const products =
+      await response.json();
+
+    productsBox.innerHTML = "";
+
+    products.forEach(product => {
+
+      const card =
+        document.createElement("div");
+
+      card.className =
+        "product-card";
+
+      card.innerHTML = `
+        <div class="product-name">
+          ${product.name || ""}
+        </div>
+
+        <div class="product-price">
+          ${product.price || 0} ريال
+        </div>
+
+        <button
+          class="edit-btn"
+          onclick="editProduct('${product._id || product.id}', '${product.name}', '${product.price}')"
+        >
+          تعديل
+        </button>
+
+        <button
+          class="delete-btn"
+          onclick="deleteProduct('${product._id || product.id}')"
+        >
+          حذف
+        </button>
+      `;
+
+      productsBox.appendChild(card);
+    });
+
+  } catch (error) {
+
+    productsBox.innerHTML =
+      "تعذر تحميل المنتجات";
+
+    console.error(error);
+  }
+}
+
+async function addProduct() {
+
+  const name =
+    document.getElementById("productName").value.trim();
+
+  const price =
+    document.getElementById("productPrice").value;
+
+  if (!name || !price) {
+
+    showMessage(
+      "اكتب اسم المنتج والسعر"
+    );
+
+    return;
+  }
+
+  try {
+
+    const response =
+      await fetch(`${API_BASE}/products`, {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          name: name,
+          price: Number(price)
+        })
+
+      });
+
+    if (!response.ok) {
+      throw new Error(
+        "فشل إضافة المنتج"
+      );
+    }
+
+    document.getElementById(
+      "productName"
+    ).value = "";
+
+    document.getElementById(
+      "productPrice"
+    ).value = "";
+
+    showMessage(
+      "تمت إضافة المنتج"
+    );
+
+    loadProducts();
+
+  } catch (error) {
+
+    showMessage(
+      "حدث خطأ أثناء الإضافة"
+    );
+
+    console.error(error);
+  }
+}
+
+async function editProduct(
+  id,
+  oldName,
+  oldPrice
+) {
+
+  const name =
+    prompt(
+      "اسم المنتج",
+      oldName
+    );
+
+  if (name === null) {
+    return;
+  }
+
+  const price =
+    prompt(
+      "السعر الجديد",
+      oldPrice
+    );
+
+  if (price === null) {
+    return;
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        `${API_BASE}/products/${id}`,
+        {
+
+          method: "PUT",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            name: name,
+            price: Number(price)
+          })
+
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        "فشل تعديل المنتج"
+      );
+    }
+
+    showMessage(
+      "تم تعديل المنتج"
+    );
+
+    loadProducts();
+
+  } catch (error) {
+
+    showMessage(
+      "حدث خطأ أثناء التعديل"
+    );
+
+    console.error(error);
+  }
+}
+
+async function deleteProduct(id) {
+
+  const confirmDelete =
+    confirm(
+      "هل تريد حذف هذا المنتج؟"
+    );
+
+  if (!confirmDelete) {
+    return;
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        `${API_BASE}/products/${id}`,
+        {
+          method: "DELETE"
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        "فشل حذف المنتج"
+      );
+    }
+
+    showMessage(
+      "تم حذف المنتج"
+    );
+
+    loadProducts();
+
+  } catch (error) {
+
+    showMessage(
+      "حدث خطأ أثناء الحذف"
+    );
+
+    console.error(error);
+  }
+}
+
+function showMessage(text) {
+
+  document.getElementById(
+    "message"
+  ).textContent = text;
+
+  setTimeout(() => {
+
+    document.getElementById(
+      "message"
+    ).textContent = "";
+
+  }, 2500);
+}
+
+loadProducts();
+
+</script>
+
+</body>
+</html>
