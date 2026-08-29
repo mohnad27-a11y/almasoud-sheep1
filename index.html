@@ -1,0 +1,15 @@
+<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>شركة المسعود للأغنام</title>
+<style>body{font-family:Arial;margin:0;background:#f6f3ed;color:#222}.wrap{max-width:950px;margin:auto;padding:18px}.hero,.card{background:#fff;border-radius:16px;padding:18px;margin:12px 0;box-shadow:0 2px 10px #0001}.chips{display:flex;gap:8px;flex-wrap:wrap}.chip,button{border:0;border-radius:10px;padding:10px 14px}.chip{background:#eee}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.price{font-size:20px;font-weight:bold}button{cursor:pointer;background:#222;color:#fff}.muted{color:#666}</style>
+<div class="wrap"><div class="hero"><h1>🐑 شركة المسعود للأغنام</h1><p>قرية الفقهاء – جازان</p><button onclick="locate()">📍 مشاركة موقعي</button><span id="loc" class="muted"></span></div>
+<div class="card"><h2>🔥 عروض اليوم</h2><div id="offers"></div></div>
+<div class="card"><h2>💰 ميزانيتك كم؟</h2><input id="budget" type="number" placeholder="مثال: 1200" style="padding:10px"><button onclick="filterBudget()">اعرض المناسب</button></div>
+<div class="card"><h2>🐑 الأقسام</h2><div class="chips"><span class="chip">بلدي</span><span class="chip">حري</span><span class="chip">تيوس</span><span class="chip">طليان</span><span class="chip">رخال</span></div></div>
+<div class="card"><h2>🆕 الأغنام المتاحة</h2><div id="sheep" class="grid"></div></div>
+<div class="card"><h2>🏪 الاستلام من الفرع</h2><p>اشترِ الآن واستلم من فرع الشركة في قرية الفقهاء – جازان، بدون رسوم توصيل.</p></div>
+<div class="card"><h2>💳 الدفع</h2><p>مدى، Visa، Mastercard، American Express، Apple Pay، Samsung Pay، Tabby، Tamara، كاش وشبكة عند الاستلام.</p></div></div>
+<script>
+let all=[];fetch('../data/sheep.json').then(r=>r.json()).then(d=>{all=d;render(d);});
+function render(items){sheep.innerHTML=items.map(s=>`<div class="card"><h3>🐑 ${s.id}</h3><p>${s.type} • ${s.age} • ${s.weight_kg} كجم</p><p class="price">${s.price} ريال</p><p>🛡️ اشترِ بثقة • ${s.status}</p><button onclick="alert('تم اختيار '+ '${s.id}')">شراء</button></div>`).join('');offers.innerHTML=all.filter(s=>s.daily_offer).map(s=>`<p><b>${s.id}</b> — ${s.type} — <s>${s.old_price} ريال</s> <b>${s.price} ريال</b></p>`).join('')||'<p>لا توجد عروض حاليًا.</p>'}
+function filterBudget(){let b=Number(budget.value);render(all.filter(s=>s.price<=b&&s.status==='متوفر'));}
+function locate(){if(!navigator.geolocation){loc.textContent=' — GPS غير مدعوم';return}loc.textContent=' جاري تحديد الموقع...';navigator.geolocation.getCurrentPosition(p=>loc.textContent=` تم تحديد الموقع: ${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)}`,()=>loc.textContent=' تعذر تحديد الموقع');}
+</script></html>
