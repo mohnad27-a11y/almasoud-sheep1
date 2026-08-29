@@ -1,5 +1,259 @@
-<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>إدارة المسعود</title>
-<style>body{font-family:Arial;max-width:1000px;margin:auto;padding:20px;background:#f7f7f7}input,select,button{padding:10px;margin:4px}table{width:100%;border-collapse:collapse;background:white}td,th{border:1px solid #ddd;padding:8px}</style>
-<h1>👨‍💼 لوحة إدارة شركة المسعود للأغنام</h1><form id="f"><input id="type" value="بلدي"><input id="price" type="number" placeholder="السعر"><input id="age" placeholder="العمر"><input id="weight" type="number" placeholder="الوزن"><label><input id="offer" type="checkbox"> عرض اليوم</label><input id="old" type="number" placeholder="السعر السابق"><button>إضافة رأس</button></form>
-<table><thead><tr><th>الرقم</th><th>النوع</th><th>السعر</th><th>العمر</th><th>الوزن</th><th>العرض</th><th>الحالة</th></tr></thead><tbody id="rows"></tbody></table>
-<script>let sheep=JSON.parse(localStorage.getItem('almasoud_sheep')||'[]');function render(){rows.innerHTML=sheep.map(s=>`<tr><td>${s.id}</td><td>${s.type}</td><td>${s.price} ريال</td><td>${s.age}</td><td>${s.weight} كجم</td><td>${s.daily_offer?'نعم':'لا'}</td><td>${s.status}</td></tr>`).join('')}f.onsubmit=e=>{e.preventDefault();let n=sheep.length+1;sheep.push({id:'MS-'+String(n).padStart(4,'0'),type:type.value,price:+price.value,age:age.value,weight:+weight.value,status:'متوفر',daily_offer:offer.checked,old_price:+old.value||null});localStorage.setItem('almasoud_sheep',JSON.stringify(sheep));f.reset();type.value='بلدي';render()};render();</script></html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>شركة المسعود للأغنام</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    header {
+      background: #176b3a;
+      color: white;
+      padding: 24px 15px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 16px;
+    }
+
+    .product {
+      background: white;
+      padding: 18px;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .product h2 {
+      margin-top: 0;
+      color: #176b3a;
+    }
+
+    .price {
+      font-size: 22px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .stock {
+      color: #666;
+      margin-bottom: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 9px;
+      background: #176b3a;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #999;
+    }
+
+    .empty {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .cart {
+      margin-top: 30px;
+      background: white;
+      padding: 20px;
+      border-radius: 14px;
+    }
+
+    .cart h2 {
+      color: #176b3a;
+    }
+
+    .cart-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .total {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>شركة المسعود للأغنام</h1>
+  <p>اختَر ما يناسبك من المواشي المتوفرة</p>
+</header>
+
+<div class="container">
+
+  <h2>المواشي المتوفرة</h2>
+
+  <div id="products" class="products"></div>
+
+  <div class="cart">
+    <h2>سلة المشتريات</h2>
+
+    <div id="cartItems"></div>
+
+    <div class="total">
+      الإجمالي:
+      <span id="total">0</span>
+      ريال
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let sheep = JSON.parse(localStorage.getItem("sheep")) || [];
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  function renderProducts() {
+    const products = document.getElementById("products");
+    products.innerHTML = "";
+
+    if (sheep.length === 0) {
+      products.innerHTML =
+        '<div class="empty">لا توجد مواشي متاحة حاليًا</div>';
+      return;
+    }
+
+    sheep.forEach((item, index) => {
+      products.innerHTML += `
+        <div class="product">
+          <h2>${item.name}</h2>
+
+          <div class="price">
+            ${item.price} ريال
+          </div>
+
+          <div class="stock">
+            المتوفر: ${item.quantity}
+          </div>
+
+          <button
+            onclick="addToCart(${index})"
+            ${item.quantity <= 0 ? "disabled" : ""}
+          >
+            ${item.quantity > 0 ? "أضف إلى السلة" : "نفد المخزون"}
+          </button>
+        </div>
+      `;
+    });
+  }
+
+  function addToCart(index) {
+    const item = sheep[index];
+
+    if (!item || item.quantity <= 0) {
+      alert("هذا المنتج غير متوفر");
+      return;
+    }
+
+    const existing = cart.find(
+      cartItem => cartItem.name === item.name
+    );
+
+    if (existing) {
+      existing.quantity += 1;
+    } else {
+      cart.push({
+        name: item.name,
+        price: Number(item.price),
+        quantity: 1
+      });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
+  }
+
+  function removeFromCart(index) {
+    cart.splice(index, 1);
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    renderCart();
+  }
+
+  function renderCart() {
+    const cartItems = document.getElementById("cartItems");
+    const totalElement = document.getElementById("total");
+
+    cartItems.innerHTML = "";
+
+    let total = 0;
+
+    if (cart.length === 0) {
+      cartItems.innerHTML = "<p>السلة فارغة</p>";
+    }
+
+    cart.forEach((item, index) => {
+      const itemTotal =
+        Number(item.price) * Number(item.quantity);
+
+      total += itemTotal;
+
+      cartItems.innerHTML += `
+        <div class="cart-item">
+          ${item.name}
+          × ${item.quantity}
+          — ${itemTotal} ريال
+
+          <button
+            style="margin-top:8px"
+            onclick="removeFromCart(${index})"
+          >
+            حذف
+          </button>
+        </div>
+      `;
+    });
+
+    totalElement.textContent = total;
+  }
+
+  renderProducts();
+  renderCart();
+</script>
+
+</body>
+</html>
