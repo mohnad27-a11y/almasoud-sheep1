@@ -321,7 +321,8 @@ function openCart(){
     let msg='طلب جديد من موقع شركة المسعود للأغنام:\n\n';
     cart.forEach((item,i)=>msg+=(i+1)+'- '+item.name+' - '+item.price+' ريال\n');
     msg+='\nالإجمالي: '+total+' ريال';
-    orderLink.href='https://wa.me/966506113217?text='+encodeURIComponent(msg);
+    orderLink.href='https://api.whatsapp.com/send?phone=966506113217&text='+encodeURIComponent(msg);
+    orderLink.target='_blank';
   }
   cartTotal.textContent=total.toLocaleString('ar-SA');
   cartModal.classList.add('open');
