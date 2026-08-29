@@ -12,9 +12,11 @@
     name="description"
     content="شركة المسعود للأغنام - لبيع الأغنام والمواشي"
   >
+  <link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#198754">
+  
 
-  <meta name="theme-color" content="#198754">
-
+  
   <title>شركة المسعود للأغنام</title>
 
   <style>
@@ -817,6 +819,16 @@
 
     renderProducts();
   </script>
-
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("./service-worker.js")
+        .catch(error => {
+          console.error("Service Worker:", error);
+        });
+    });
+  }
+</script>
 </body>
 </html>
