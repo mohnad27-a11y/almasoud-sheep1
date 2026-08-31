@@ -3,154 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة الإدارة - المسعود للأغنام</title>
+
+  <title>إدارة شركة المسعود للأغنام</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
       margin: 0;
+      background: #f4f4f4;
+      color: #222;
+    }
+
+    header {
+      background: #198754;
+      color: white;
       padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    header p {
+      margin: 8px 0 0;
     }
 
     .container {
       max-width: 900px;
-      margin: auto;
-    }
-
-    h1 {
-      text-align: center;
-      color: #176b3a;
-    }
-
-    .card {
-      background: white;
-      padding: 20px;
-      margin-bottom: 15px;
-      border-radius: 12px;
-    }
-
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 8px;
-      box-sizing: border-box;
-    }
-
-    button {
-      background: #176b3a;
-      color: white;
-      border: 0;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background: white;
-    }
-
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      text-align: center;
-    }
-  </style>
-</head>
-
-<body>
-
-<div class="container">
-
-  <h1>لوحة إدارة المسعود للأغنام</h1>
-
-  <div class="card">
-    <h2>إضافة رأس جديد</h2>
-
-    <input id="name" placeholder="اسم / نوع الخروف">
-    <input id="price" type="number" placeholder="السعر بالريال">
-    <input id="quantity" type="number" placeholder="الكمية">
-
-    <button onclick="addSheep()">إضافة</button>
-  </div>
-
-  <div class="card">
-    <h2>المخزون</h2>
-
-    <table>
-      <thead>
-        <tr>
-          <th>النوع</th>
-          <th>السعر</th>
-          <th>الكمية</th>
-          <th>حذف</th>
-        </tr>
-      </thead>
-
-      <tbody id="sheepTable"></tbody>
-    </table>
-  </div>
-
-</div>
-
-<script>
-let sheep = JSON.parse(localStorage.getItem("sheep")) || [];
-
-function save() {
-  localStorage.setItem("sheep", JSON.stringify(sheep));
-  render();
-}
-
-function addSheep() {
-  const name = document.getElementById("name").value;
-  const price = document.getElementById("price").value;
-  const quantity = document.getElementById("quantity").value;
-
-  if (!name || !price || !quantity) {
-    alert("يرجى تعبئة جميع البيانات");
-    return;
-  }
-
-  sheep.push({
-    name: name,
-    price: Number(price),
-    quantity: Number(quantity)
-  });
-
-  save();
-
-  document.getElementById("name").value = "";
-  document.getElementById("price").value = "";
-  document.getElementById("quantity").value = "";
-}
-
-function removeSheep(index) {
-  sheep.splice(index, 1);
-  save();
-}
-
-function render() {
-  const table = document.getElementById("sheepTable");
-  table.innerHTML = "";
-
-  sheep.forEach((item, index) => {
-    table.innerHTML += `
-      <tr>
-        <td>${item.name}</td>
-        <td>${item.price} ريال</td>
-        <td>${item.quantity}</td>
-        <td>
-          <button onclick="removeSheep(${index})">حذف</button>
-        </td>
-      </tr>
-    `;
-  });
-}
-
-render();
-</script>
-
-</body>
-</html>
+      margin: 20
