@@ -1,64 +1,499 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>إدارة شركة المسعود للأغنام</title>
+<title>إدارة شركة المسعود للأغنام</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      color: #222;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  color: #222;
+}
 
-    header {
-      background: #198754;
-      color: white;
-      padding: 25px 15px;
-      text-align: center;
-    }
+header {
+  background: #198754;
+  color: white;
+  padding: 22px 15px;
+  text-align: center;
+}
 
-    header h1 {
-      margin: 0;
-      font-size: 25px;
-    }
+header h1 {
+  margin: 0;
+  font-size: 24px;
+}
 
-    .container {
-      padding: 15px;
-      max-width: 700px;
-      margin: auto;
-    }
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 15px;
+}
 
-    .card {
-      background: white;
-      padding: 20px;
-      margin-top: 20px;
-      border-radius: 15px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    }
+.card {
+  background: white;
+  padding: 18px;
+  margin: 15px 0;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
 
-    h2 {
-      color: #198754;
-    }
+.card h2 {
+  margin-top: 0;
+  font-size: 20px;
+}
 
-    label {
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
+.status {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  display: inline-block;
+  margin-bottom: 12px;
+}
 
-    input,
-    select {
-      width: 100%;
-      padding: 13px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-     
+.active {
+  background: #d1e7dd;
+  color: #0f5132;
+}
+
+.stopped {
+  background: #f8d7da;
+  color: #842029;
+}
+
+button {
+  border: 0;
+  border-radius: 9px;
+  padding: 12px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 4px;
+}
+
+.stop-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.start-btn {
+  background: #198754;
+  color: white;
+}
+
+.block-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.unblock-btn {
+  background: #198754;
+  color: white;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 7px 0;
+  border: 1px solid #ccc;
+  border-radius: 9px;
+  font-size: 16px;
+}
+
+.person {
+  border-top: 1px solid #eee;
+  padding: 12px 0;
+}
+
+.notice {
+  background: #fff3cd;
+  color: #664d03;
+  padding: 12px;
+  border-radius: 9px;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>لوحة إدارة شركة المسعود للأغنام</h1>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>التحكم في تطبيق العملاء</h2>
+
+    <div id="customerAppStatus" class="status active">
+      التطبيق يعمل
+    </div>
+
+    <br>
+
+    <button class="stop-btn" onclick="stopCustomerApp()">
+      إيقاف تطبيق العملاء
+    </button>
+
+    <button class="start-btn" onclick="startCustomerApp()">
+      تشغيل تطبيق العملاء
+    </button>
+  </div>
+
+
+  <div class="card">
+    <h2>التحكم في تطبيق التوصيل</h2>
+
+    <div id="driverAppStatus" class="status active">
+      التطبيق يعمل
+    </div>
+
+    <br>
+
+    <button class="stop-btn" onclick="stopDriverApp()">
+      إيقاف تطبيق التوصيل
+    </button>
+
+    <button class="start-btn" onclick="startDriverApp()">
+      تشغيل تطبيق التوصيل
+    </button>
+  </div>
+
+
+  <div class="card">
+    <h2>إدارة العملاء</h2>
+
+    <input
+      id="customerName"
+      type="text"
+      placeholder="اسم العميل أو رقم الجوال"
+    >
+
+    <input
+      id="customerReason"
+      type="text"
+      placeholder="سبب الإيقاف"
+    >
+
+    <button class="block-btn" onclick="blockCustomer()">
+      إيقاف العميل
+    </button>
+
+    <div id="customersList"></div>
+  </div>
+
+
+  <div class="card">
+    <h2>إدارة السائقين</h2>
+
+    <input
+      id="driverName"
+      type="text"
+      placeholder="اسم السائق أو رقم الجوال"
+    >
+
+    <input
+      id="driverReason"
+      type="text"
+      placeholder="سبب الإيقاف"
+    >
+
+    <button class="block-btn" onclick="blockDriver()">
+      إيقاف السائق
+    </button>
+
+    <div id="driversList"></div>
+  </div>
+
+
+  <div class="notice">
+    صلاحيات الإيقاف والتفعيل مخصصة للمدير.
+  </div>
+
+</div>
+
+
+<script>
+
+let customerAppEnabled =
+  localStorage.getItem("customerAppEnabled") !== "false";
+
+let driverAppEnabled =
+  localStorage.getItem("driverAppEnabled") !== "false";
+
+
+function updateStatus() {
+
+  const customerStatus =
+    document.getElementById("customerAppStatus");
+
+  const driverStatus =
+    document.getElementById("driverAppStatus");
+
+
+  if (customerAppEnabled) {
+
+    customerStatus.textContent = "التطبيق يعمل";
+
+    customerStatus.className =
+      "status active";
+
+  } else {
+
+    customerStatus.textContent =
+      "التطبيق متوقف";
+
+    customerStatus.className =
+      "status stopped";
+  }
+
+
+  if (driverAppEnabled) {
+
+    driverStatus.textContent =
+      "التطبيق يعمل";
+
+    driverStatus.className =
+      "status active";
+
+  } else {
+
+    driverStatus.textContent =
+      "التطبيق متوقف";
+
+    driverStatus.className =
+      "status stopped";
+  }
+}
+
+
+function stopCustomerApp() {
+
+  if (!confirm("هل تريد إيقاف تطبيق العملاء؟"))
+    return;
+
+  customerAppEnabled = false;
+
+  localStorage.setItem(
+    "customerAppEnabled",
+    "false"
+  );
+
+  updateStatus();
+}
+
+
+function startCustomerApp() {
+
+  customerAppEnabled = true;
+
+  localStorage.setItem(
+    "customerAppEnabled",
+    "true"
+  );
+
+  updateStatus();
+}
+
+
+function stopDriverApp() {
+
+  if (!confirm("هل تريد إيقاف تطبيق التوصيل؟"))
+    return;
+
+  driverAppEnabled = false;
+
+  localStorage.setItem(
+    "driverAppEnabled",
+    "false"
+  );
+
+  updateStatus();
+}
+
+
+function startDriverApp() {
+
+  driverAppEnabled = true;
+
+  localStorage.setItem(
+    "driverAppEnabled",
+    "true"
+  );
+
+  updateStatus();
+}
+
+
+let blockedCustomers =
+  JSON.parse(
+    localStorage.getItem("blockedCustomers") || "[]"
+  );
+
+
+let blockedDrivers =
+  JSON.parse(
+    localStorage.getItem("blockedDrivers") || "[]"
+  );
+
+
+function blockCustomer() {
+
+  const name =
+    document.getElementById("customerName")
+    .value.trim();
+
+  const reason =
+    document.getElementById("customerReason")
+    .value.trim();
+
+  if (!name) {
+    alert("اكتب اسم العميل أو رقم الجوال");
+    return;
+  }
+
+  blockedCustomers.push({
+    name: name,
+    reason: reason || "غير محدد",
+    date: new Date().toLocaleString("ar-SA")
+  });
+
+  localStorage.setItem(
+    "blockedCustomers",
+    JSON.stringify(blockedCustomers)
+  );
+
+  document.getElementById("customerName").value = "";
+  document.getElementById("customerReason").value = "";
+
+  renderCustomers();
+}
+
+
+function unblockCustomer(index) {
+
+  blockedCustomers.splice(index, 1);
+
+  localStorage.setItem(
+    "blockedCustomers",
+    JSON.stringify(blockedCustomers)
+  );
+
+  renderCustomers();
+}
+
+
+function renderCustomers() {
+
+  const box =
+    document.getElementById("customersList");
+
+  box.innerHTML = "";
+
+  blockedCustomers.forEach((customer, index) => {
+
+    box.innerHTML += `
+      <div class="person">
+        <strong>${customer.name}</strong><br>
+        الحالة: موقوف<br>
+        السبب: ${customer.reason}<br>
+        التاريخ: ${customer.date}<br>
+
+        <button
+          class="unblock-btn"
+          onclick="unblockCustomer(${index})">
+          إعادة تفعيل العميل
+        </button>
+      </div>
+    `;
+  });
+}
+
+
+function blockDriver() {
+
+  const name =
+    document.getElementById("driverName")
+    .value.trim();
+
+  const reason =
+    document.getElementById("driverReason")
+    .value.trim();
+
+  if (!name) {
+    alert("اكتب اسم السائق أو رقم الجوال");
+    return;
+  }
+
+  blockedDrivers.push({
+    name: name,
+    reason: reason || "غير محدد",
+    date: new Date().toLocaleString("ar-SA")
+  });
+
+  localStorage.setItem(
+    "blockedDrivers",
+    JSON.stringify(blockedDrivers)
+  );
+
+  document.getElementById("driverName").value = "";
+  document.getElementById("driverReason").value = "";
+
+  renderDrivers();
+}
+
+
+function unblockDriver(index) {
+
+  blockedDrivers.splice(index, 1);
+
+  localStorage.setItem(
+    "blockedDrivers",
+    JSON.stringify(blockedDrivers)
+  );
+
+  renderDrivers();
+}
+
+
+function renderDrivers() {
+
+  const box =
+    document.getElementById("driversList");
+
+  box.innerHTML = "";
+
+  blockedDrivers.forEach((driver, index) => {
+
+    box.innerHTML += `
+      <div class="person">
+        <strong>${driver.name}</strong><br>
+        الحالة: موقوف<br>
+        السبب: ${driver.reason}<br>
+        التاريخ: ${driver.date}<br>
+
+        <button
+          class="unblock-btn"
+          onclick="unblockDriver(${index})">
+          إعادة تفعيل السائق
+        </button>
+      </div>
+    `;
+  });
+}
+
+
+updateStatus();
+renderCustomers();
+renderDrivers();
+
+</script>
+
+</body>
+</html>
