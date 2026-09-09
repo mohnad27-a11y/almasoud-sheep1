@@ -367,12 +367,11 @@
   async function checkAdminPermission(email) {
 
     const id =
-      email
-        .toLowerCase()
-        .replace(/\./g, "_");
+  email
+    .toLowerCase();
 
-    const adminRef =
-      doc(db, "admins", id);
+const adminRef =
+  doc(db, "admins", id);
 
     const adminSnap =
       await getDoc(adminRef);
