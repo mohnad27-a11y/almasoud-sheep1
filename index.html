@@ -819,16 +819,50 @@
 
     renderProducts();
   </script>
+
 <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("./service-worker.js")
-        .catch(error => {
-          console.error("Service Worker:", error);
-        });
+async function checkCustomerAppStatus() {
+  try {
+    const response = await fetch("./status.json?t=" + Date.now(), {
+      cache: "no-store"
     });
+
+    if (!response.ok) return;
+
+    const status = await response.json();
+
+    if (status.customerAppEnabled === false) {
+      document.body.innerHTML = `
+        <div style="
+          min-height:100vh;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          text-align:center;
+          padding:25px;
+          background:#f4f4f4;
+          font-family:Arial,sans-serif;
+          direction:rtl;
+        ">
+          <div>
+            <h1 style="color:#198754">
+              شركة المسعود للأغنام
+            </h1>
+            <h2>التطبيق متوقف مؤقتًا</h2>
+            <p>
+              ${status.maintenanceMessage || "التطبيق متوقف مؤقتًا للصيانة، يرجى المحاولة لاحقًا."}
+            </p>
+          </div>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error("تعذر التحقق من حالة التطبيق:", error);
   }
+}
+
+checkCustomerAppStatus();
 </script>
+
 </body>
 </html>
