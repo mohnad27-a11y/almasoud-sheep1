@@ -179,13 +179,13 @@
   </div>
 
 
-  <!-- رمز التحقق -->
+  <!-- تأكيد الدخول -->
   <div class="card" id="verificationSection">
 
     <h2>تأكيد الدخول</h2>
 
     <p>
-      تم إرسال رمز تأكيد إلى البريد الإلكتروني المعتمد.
+      أدخل رمز التحقق المرسل إلى البريد الإلكتروني المعتمد.
     </p>
 
     <label>رمز التحقق</label>
@@ -195,6 +195,7 @@
       id="verificationCode"
       maxlength="6"
       inputmode="numeric"
+      autocomplete="one-time-code"
       placeholder="000000"
     >
 
@@ -267,20 +268,19 @@
   } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
 
-  /*
-  ========================================
-  ضع بيانات Firebase الخاصة بمشروعك هنا
-  ========================================
-  */
-
   const firebaseConfig = {
-  apiKey: "AIzaSyC7roZ6DHGWpAVqttstjiXObedYON1OGRY",
-  authDomain: "almasoud-sheep.firebaseapp.com",
-  projectId: "almasoud-sheep",
-  storageBucket: "almasoud-sheep.firebasestorage.app",
-  messagingSenderId: "1094929023699",
-  appId: "1:1094929023699:web:3922bf59d3340480e84a26"
-};
+    apiKey: "AIzaSyC7roZ6DHGWpAVqttstjiXObedYON1OGRY",
+    authDomain: "almasoud-sheep.firebaseapp.com",
+    projectId: "almasoud-sheep",
+    storageBucket: "almasoud-sheep.firebasestorage.app",
+    messagingSenderId: "1094929023699",
+    appId: "1:1094929023699:web:3922bf59d3340480e84a26"
+  };
+
+
+  const APPS_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbwOISdh0mzkCf43XK8QomT-B7jgWaDdzPo7BOmN0eQHSeIWg3Bi_el4KaYgUl-udfo/exec";
+
 
   const app = initializeApp(firebaseConfig);
 
@@ -331,47 +331,25 @@
 
   let currentUserEmail = "";
 
-  let generatedCode = "";
 
-  let codeExpires = 0;
-
-
-  function showMessage(
-    element,
-    text,
-    type = "error"
-  ) {
+  function showMessage(element, text, type = "error") {
 
     element.textContent = text;
 
     element.className =
       "message " + type;
-
-  }
-
-
-  function generateCode() {
-
-    generatedCode =
-      Math.floor(
-        100000 +
-        Math.random() * 900000
-      ).toString();
-
-    codeExpires =
-      Date.now() + (5 * 60 * 1000);
-
   }
 
 
   async function checkAdminPermission(email) {
 
     const id =
-  email
-    .toLowerCase();
+      email
+        .trim()
+        .toLowerCase();
 
-const adminRef =
-  doc(db, "admins", id);
+    const adminRef =
+      doc(db, "admins", id);
 
     const adminSnap =
       await getDoc(adminRef);
@@ -388,100 +366,165 @@ const adminRef =
     }
 
     return true;
-
   }
-const APPS_SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbwOISdh0mzkCf43XK8QomT-B7jgWaDdzPo7BOmN0eQHSeIWg3Bi_el4KaYgUl-udfo/exec";
 
-function callAdminApi(action, code = "") {
-  return new Promise((resolve, reject) => {
-    const callbackName =
-      "adminCallback_" + Date.now();
 
-    const script = document.createElement("script");
+  function callAdminApi(action, code = "") {
 
-    window[callbackName] = function(data) {
-      resolve(data);
-      delete window[callbackName];
-      script.remove();
-    };
+    return new Promise((resolve, reject) => {
 
-    script.onerror = function() {
-      delete window[callbackName];
-      script.remove();
-      reject(new Error("تعذر الاتصال بالخادم"));
-    };
+      const callbackName =
+        "adminCallback_" +
+        Date.now() +
+        "_" +
+        Math.floor(Math.random() * 100000);
 
-    const params = new URLSearchParams({
-      action: action,
-      callback: callbackName
+
+      const script =
+        document.createElement("script");
+
+
+      const timeout =
+        setTimeout(() => {
+
+          delete window[callbackName];
+
+          script.remove();
+
+          reject(
+            new Error("انتهت مهلة الاتصال")
+          );
+
+        }, 15000);
+
+
+      window[callbackName] =
+        function(data) {
+
+          clearTimeout(timeout);
+
+          delete window[callbackName];
+
+          script.remove();
+
+          resolve(data);
+        };
+
+
+      script.onerror =
+        function() {
+
+          clearTimeout(timeout);
+
+          delete window[callbackName];
+
+          script.remove();
+
+          reject(
+            new Error("تعذر الاتصال بخادم التحقق")
+          );
+        };
+
+
+      const params =
+        new URLSearchParams({
+          action: action,
+          callback: callbackName
+        });
+
+
+      if (code) {
+
+        params.set(
+          "code",
+          code
+        );
+      }
+
+
+      script.src =
+        APPS_SCRIPT_URL +
+        "?" +
+        params.toString();
+
+
+      document.body.appendChild(script);
+
     });
+  }
 
-    if (code) {
-      params.set("code", code);
-    }
 
-    script.src =
-      APPS_SCRIPT_URL + "?" + params.toString();
+  async function sendVerificationCode() {
 
-    document.body.appendChild(script);
-  });
-}
+    try {
 
-async function sendVerificationCode() {
-  try {
-    const result = await callAdminApi("send");
+      const result =
+        await callAdminApi("send");
 
-    if (result && result.ok) {
+
+      if (
+        result &&
+        result.ok === true
+      ) {
+
+        showMessage(
+          verifyMessage,
+          result.message ||
+          "تم إرسال رمز التحقق إلى البريد المعتمد.",
+          "success"
+        );
+
+        return true;
+      }
+
+
       showMessage(
         verifyMessage,
-        "تم إرسال رمز التحقق إلى بريد الإدارة.",
-        "success"
+        result?.message ||
+        "تعذر إرسال رمز التحقق.",
+        "error"
       );
-      return true;
+
+      return false;
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      showMessage(
+        verifyMessage,
+        "تعذر الاتصال بخادم إرسال الرمز.",
+        "error"
+      );
+
+      return false;
     }
-
-    showMessage(
-      verifyMessage,
-      result?.message || "تعذر إرسال رمز التحقق.",
-      "error"
-    );
-
-    return false;
-
-  } catch (error) {
-    showMessage(
-      verifyMessage,
-      "تعذر الاتصال بخادم التحقق.",
-      "error"
-    );
-
-    return false;
   }
-}
 
-async function verifyAdminCode(code) {
-  try {
-    const result =
-      await callAdminApi("verify", code);
 
-    return result && result.ok === true;
+  async function verifyAdminCode(code) {
 
-  } catch (error) {
-    return false;
-  }
-}
-    console.log(
-      "رمز التحقق للتجربة:",
-      generatedCode
-    );
+    try {
 
-    showMessage(
-      verifyMessage,
-      "تم إنشاء رمز التحقق. سنربط إرسال الرمز إلى البريد في الخطوة التالية.",
-      "success"
-    );
+      const result =
+        await callAdminApi(
+          "verify",
+          code
+        );
 
+      return result;
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      return {
+        ok: false,
+        message: "تعذر الاتصال بخادم التحقق."
+      };
+    }
   }
 
 
@@ -495,7 +538,7 @@ async function verifyAdminCode(code) {
           .toLowerCase();
 
       const password =
-        passwordInput.value.trim();
+        passwordInput.value;
 
 
       if (!email || !password) {
@@ -506,7 +549,6 @@ async function verifyAdminCode(code) {
         );
 
         return;
-
       }
 
 
@@ -542,7 +584,6 @@ async function verifyAdminCode(code) {
           );
 
           return;
-
         }
 
 
@@ -550,13 +591,47 @@ async function verifyAdminCode(code) {
           result.user.email;
 
 
-
-
         loginSection.style.display =
           "none";
 
         verificationSection.style.display =
           "block";
+
+
+        showMessage(
+          verifyMessage,
+          "جاري إرسال رمز التحقق...",
+          "success"
+        );
+
+
+        const sent =
+          await sendVerificationCode();
+
+
+        if (!sent) {
+
+          verificationSection.style.display =
+            "none";
+
+          loginSection.style.display =
+            "block";
+
+          await signOut(auth);
+
+          showMessage(
+            loginMessage,
+            "تعذر إرسال رمز التحقق إلى البريد. حاول مرة أخرى."
+          );
+
+          return;
+        }
+
+
+        verificationCode.value =
+          "";
+
+        verificationCode.focus();
 
 
       } catch (error) {
@@ -568,13 +643,14 @@ async function verifyAdminCode(code) {
           "تعذر تسجيل الدخول. تأكد من البريد وكلمة المرور."
         );
 
+
       } finally {
 
-        loginBtn.disabled = false;
+        loginBtn.disabled =
+          false;
 
         loginBtn.textContent =
           "تسجيل الدخول";
-
       }
 
     }
@@ -586,42 +662,53 @@ async function verifyAdminCode(code) {
     async () => {
 
       const entered =
-        verificationCode.value.trim();
+        verificationCode.value
+          .trim();
 
 
-      if (!entered) {
+      if (!/^\d{6}$/.test(entered)) {
 
         showMessage(
           verifyMessage,
-          "أدخل رمز التحقق."
+          "أدخل رمز التحقق المكوّن من 6 أرقام."
         );
 
         return;
-
       }
 
 
-      if (Date.now() > codeExpires) {
+      verifyBtn.disabled =
+        true;
 
-        showMessage(
-          verifyMessage,
-          "انتهت صلاحية الرمز. اضغط إعادة إرسال الرمز."
+      verifyBtn.textContent =
+        "جاري التحقق...";
+
+
+      const result =
+        await verifyAdminCode(
+          entered
         );
 
-        return;
 
-      }
+      verifyBtn.disabled =
+        false;
+
+      verifyBtn.textContent =
+        "تأكيد الرمز";
 
 
-      if (entered !== generatedCode) {
+      if (
+        !result ||
+        result.ok !== true
+      ) {
 
         showMessage(
           verifyMessage,
+          result?.message ||
           "رمز التحقق غير صحيح."
         );
 
         return;
-
       }
 
 
@@ -634,7 +721,8 @@ async function verifyAdminCode(code) {
       adminEmail.textContent =
         currentUserEmail;
 
-  });
+    }
+  );
 
 
   resendBtn.addEventListener(
@@ -642,12 +730,31 @@ async function verifyAdminCode(code) {
     async () => {
 
       if (!currentUserEmail) {
+
+        showMessage(
+          verifyMessage,
+          "يجب تسجيل الدخول أولًا."
+        );
+
         return;
       }
 
-      await sendVerificationCode(
-        currentUserEmail
-      );
+
+      resendBtn.disabled =
+        true;
+
+      resendBtn.textContent =
+        "جاري الإرسال...";
+
+
+      await sendVerificationCode();
+
+
+      resendBtn.disabled =
+        false;
+
+      resendBtn.textContent =
+        "إعادة إرسال الرمز";
 
     }
   );
