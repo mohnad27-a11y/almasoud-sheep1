@@ -1,5 +1,5 @@
 {
-  "customerAppEnabled": true,
-  "deliveryAppEnabled": true,
+  "customerAppEnabled": false,
+"deliveryAppEnabled": true,
   "maintenanceMessage": "التطبيق متوقف مؤقتًا للصيانة، يرجى المحاولة لاحقًا."
 }
