@@ -390,26 +390,87 @@ const adminRef =
     return true;
 
   }
+const APPS_SCRIPT_URL =
+"https://script.google.com/macros/s/AKfycbwOISdh0mzkCf43XK8QomT-B7jgWaDdzPo7BOmN0eQHSeIWg3Bi_el4KaYgUl-udfo/exec";
 
+function callAdminApi(action, code = "") {
+  return new Promise((resolve, reject) => {
+    const callbackName =
+      "adminCallback_" + Date.now();
 
-  async function sendVerificationCode(email) {
+    const script = document.createElement("script");
 
-    generateCode();
+    window[callbackName] = function(data) {
+      resolve(data);
+      delete window[callbackName];
+      script.remove();
+    };
 
-    /*
-    ========================================
+    script.onerror = function() {
+      delete window[callbackName];
+      script.remove();
+      reject(new Error("تعذر الاتصال بالخادم"));
+    };
 
-    مهم:
+    const params = new URLSearchParams({
+      action: action,
+      callback: callbackName
+    });
 
-    إرسال رمز حقيقي إلى البريد لا يتم بأمان
-    من صفحة GitHub Pages نفسها.
+    if (code) {
+      params.set("code", code);
+    }
 
-    سنربط هذا الجزء في الخطوة التالية
-    بخادم Firebase Cloud Function.
+    script.src =
+      APPS_SCRIPT_URL + "?" + params.toString();
 
-    ========================================
-    */
+    document.body.appendChild(script);
+  });
+}
 
+async function sendVerificationCode() {
+  try {
+    const result = await callAdminApi("send");
+
+    if (result && result.ok) {
+      showMessage(
+        verifyMessage,
+        "تم إرسال رمز التحقق إلى بريد الإدارة.",
+        "success"
+      );
+      return true;
+    }
+
+    showMessage(
+      verifyMessage,
+      result?.message || "تعذر إرسال رمز التحقق.",
+      "error"
+    );
+
+    return false;
+
+  } catch (error) {
+    showMessage(
+      verifyMessage,
+      "تعذر الاتصال بخادم التحقق.",
+      "error"
+    );
+
+    return false;
+  }
+}
+
+async function verifyAdminCode(code) {
+  try {
+    const result =
+      await callAdminApi("verify", code);
+
+    return result && result.ok === true;
+
+  } catch (error) {
+    return false;
+  }
+}
     console.log(
       "رمز التحقق للتجربة:",
       generatedCode
