@@ -863,6 +863,46 @@ async function checkCustomerAppStatus() {
 
 checkCustomerAppStatus();
 </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs
+  } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyC7roZ6DHGWpAVqttstjiXObedYON1OGRY",
+    authDomain: "almasoud-sheep.firebaseapp.com",
+    projectId: "almasoud-sheep",
+    storageBucket: "almasoud-sheep.firebasestorage.app",
+    messagingSenderId: "1094929023699",
+    appId: "1:1094929023699:web:8978da15d8ea8d09e84a26"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  async function loadFirebaseProducts() {
+    try {
+      const snapshot = await getDocs(collection(db, "products"));
+
+      const firebaseProducts = [];
+
+      snapshot.forEach((doc) => {
+        firebaseProducts.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      });
+
+      console.log("منتجات Firebase:", firebaseProducts);
+    } catch (error) {
+      console.error("تعذر تحميل منتجات Firebase:", error);
+    }
+  }
+
+  loadFirebaseProducts();
+</script>
 </body>
 </html>
