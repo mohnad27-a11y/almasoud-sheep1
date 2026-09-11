@@ -23,14 +23,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(webView);
 
         WebSettings settings = webView.getSettings();
+
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
+        settings.setLoadWithOverviewMode(true);
+        settings.setUseWideViewPort(true);
 
         webView.setWebViewClient(new WebViewClient());
         webView.setWebChromeClient(new WebChromeClient());
 
         webView.loadUrl(
-            "https://mohnad27-a11y.github.io/almasoud-sheep1/"
+            "https://mohnad27-a11y.github.io/almasoud-sheep1/admin.html"
         );
 
         getOnBackPressedDispatcher().addCallback(
@@ -38,11 +41,13 @@ public class MainActivity extends AppCompatActivity {
             new OnBackPressedCallback(true) {
                 @Override
                 public void handleOnBackPressed() {
+
                     if (webView.canGoBack()) {
                         webView.goBack();
                     } else {
                         finish();
                     }
+
                 }
             }
         );
