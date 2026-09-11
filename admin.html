@@ -1,497 +1,681 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>إدارة شركة المسعود للأغنام</title>
+  <title>إدارة شركة المسعود للأغنام</title>
 
-<style>
-* {
-  box-sizing: border-box;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
-  color: #222;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f5f4;
+      color: #222;
+    }
 
-header {
-  background: #198754;
-  color: white;
-  padding: 22px 15px;
-  text-align: center;
-}
+    header {
+      background: #198754;
+      color: white;
+      padding: 22px 15px;
+      text-align: center;
+    }
 
-header h1 {
-  margin: 0;
-  font-size: 24px;
-}
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
 
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 15px;
-}
+    header p {
+      margin: 8px 0 0;
+      font-size: 14px;
+    }
 
-.card {
-  background: white;
-  padding: 18px;
-  margin: 15px 0;
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.08);
-}
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 15px;
+    }
 
-.card h2 {
-  margin-top: 0;
-  font-size: 20px;
-}
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
 
-.status {
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-weight: bold;
-  display: inline-block;
-  margin-bottom: 12px;
-}
+    .card h2 {
+      margin-top: 0;
+      color: #198754;
+      font-size: 20px;
+    }
 
-.active {
-  background: #d1e7dd;
-  color: #0f5132;
-}
+    input,
+    select {
+      width: 100%;
+      padding: 13px;
+      margin: 6px 0;
+      border: 1px solid #ddd;
+      border-radius: 9px;
+      font-size: 16px;
+    }
 
-.stopped {
-  background: #f8d7da;
-  color: #842029;
-}
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 15px;
+    }
 
-button {
-  border: 0;
-  border-radius: 9px;
-  padding: 12px 15px;
-  font-size: 16px;
-  cursor: pointer;
-  margin: 4px;
-}
+    .btn-main {
+      width: 100%;
+      margin-top: 8px;
+      background: #198754;
+      color: white;
+    }
 
-.stop-btn {
-  background: #dc3545;
-  color: white;
-}
+    .btn-edit {
+      background: #ffc107;
+      color: #222;
+    }
 
-.start-btn {
-  background: #198754;
-  color: white;
-}
+    .btn-delete {
+      background: #dc3545;
+      color: white;
+    }
 
-.block-btn {
-  background: #dc3545;
-  color: white;
-}
+    .btn-refresh {
+      background: #0d6efd;
+      color: white;
+      margin-bottom: 10px;
+    }
 
-.unblock-btn {
-  background: #198754;
-  color: white;
-}
+    #message {
+      text-align: center;
+      margin: 10px 0;
+      font-weight: bold;
+    }
 
-input {
-  width: 100%;
-  padding: 12px;
-  margin: 7px 0;
-  border: 1px solid #ccc;
-  border-radius: 9px;
-  font-size: 16px;
-}
+    .product {
+      background: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 10px;
+      border: 1px solid #eee;
+    }
 
-.person {
-  border-top: 1px solid #eee;
-  padding: 12px 0;
-}
+    .product h3 {
+      margin: 0 0 8px;
+    }
 
-.notice {
-  background: #fff3cd;
-  color: #664d03;
-  padding: 12px;
-  border-radius: 9px;
-  margin-top: 10px;
-}
-</style>
+    .product p {
+      margin: 5px 0;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .actions button {
+      flex: 1;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: #d1e7dd;
+      color: #0f5132;
+      font-size: 13px;
+    }
+
+    .empty {
+      text-align: center;
+      color: #777;
+      padding: 20px;
+    }
+  </style>
 </head>
 
 <body>
 
 <header>
-  <h1>لوحة إدارة شركة المسعود للأغنام</h1>
+  <h1>لوحة إدارة المسعود للأغنام</h1>
+  <p>إدارة المنتجات والأسعار والمخزون</p>
 </header>
 
 <div class="container">
 
   <div class="card">
-    <h2>التحكم في تطبيق العملاء</h2>
+    <h2>إضافة رأس جديد</h2>
 
-    <div id="customerAppStatus" class="status active">
-      التطبيق يعمل
+    <input
+      id="productName"
+      type="text"
+      placeholder="اسم / نوع الرأس"
+    >
+
+    <select id="productCategory">
+      <option value="">اختر التصنيف</option>
+      <option value="بلدي">بلدي</option>
+      <option value="حري">حري</option>
+      <option value="تيوس">تيوس</option>
+      <option value="طليان">طليان</option>
+      <option value="رخال">رخال</option>
+    </select>
+
+    <input
+      id="productNumber"
+      type="text"
+      placeholder="رقم الرأس"
+    >
+
+    <input
+      id="productPrice"
+      type="number"
+      placeholder="السعر بالريال"
+    >
+
+    <input
+      id="productStock"
+      type="number"
+      placeholder="الكمية / المخزون"
+      value="1"
+    >
+
+    <button
+      class="btn-main"
+      onclick="addProduct()"
+    >
+      إضافة المنتج
+    </button>
+
+    <div id="message"></div>
+  </div>
+
+  <div class="card">
+    <h2>المنتجات الحالية</h2>
+
+    <button
+      class="btn-refresh"
+      onclick="loadProducts()"
+    >
+      تحديث المنتجات
+    </button>
+
+    <div id="productsBox">
+      جاري تحميل المنتجات...
     </div>
-
-    <br>
-
-    <button class="stop-btn" onclick="stopCustomerApp()">
-      إيقاف تطبيق العملاء
-    </button>
-
-    <button class="start-btn" onclick="startCustomerApp()">
-      تشغيل تطبيق العملاء
-    </button>
-  </div>
-
-
-  <div class="card">
-    <h2>التحكم في تطبيق التوصيل</h2>
-
-    <div id="driverAppStatus" class="status active">
-      التطبيق يعمل
-    </div>
-
-    <br>
-
-    <button class="stop-btn" onclick="stopDriverApp()">
-      إيقاف تطبيق التوصيل
-    </button>
-
-    <button class="start-btn" onclick="startDriverApp()">
-      تشغيل تطبيق التوصيل
-    </button>
-  </div>
-
-
-  <div class="card">
-    <h2>إدارة العملاء</h2>
-
-    <input
-      id="customerName"
-      type="text"
-      placeholder="اسم العميل أو رقم الجوال"
-    >
-
-    <input
-      id="customerReason"
-      type="text"
-      placeholder="سبب الإيقاف"
-    >
-
-    <button class="block-btn" onclick="blockCustomer()">
-      إيقاف العميل
-    </button>
-
-    <div id="customersList"></div>
-  </div>
-
-
-  <div class="card">
-    <h2>إدارة السائقين</h2>
-
-    <input
-      id="driverName"
-      type="text"
-      placeholder="اسم السائق أو رقم الجوال"
-    >
-
-    <input
-      id="driverReason"
-      type="text"
-      placeholder="سبب الإيقاف"
-    >
-
-    <button class="block-btn" onclick="blockDriver()">
-      إيقاف السائق
-    </button>
-
-    <div id="driversList"></div>
-  </div>
-
-
-  <div class="notice">
-    صلاحيات الإيقاف والتفعيل مخصصة للمدير.
   </div>
 
 </div>
 
-
 <script>
 
-let customerAppEnabled =
-  localStorage.getItem("customerAppEnabled") !== "false";
-
-let driverAppEnabled =
-  localStorage.getItem("driverAppEnabled") !== "false";
+const API_BASE =
+  "https://script.google.com/macros/s/AKfycbxSNDLVTFTAT7N-1Jiw3gfCvtAKod1ne8AMqELhXK1Y5evteBtr4ssarTLolw4bskc/exec";
 
 
-function updateStatus() {
+function showMessage(text, error = false) {
 
-  const customerStatus =
-    document.getElementById("customerAppStatus");
+  const box = document.getElementById("message");
 
-  const driverStatus =
-    document.getElementById("driverAppStatus");
+  box.textContent = text;
 
-
-  if (customerAppEnabled) {
-
-    customerStatus.textContent = "التطبيق يعمل";
-
-    customerStatus.className =
-      "status active";
-
-  } else {
-
-    customerStatus.textContent =
-      "التطبيق متوقف";
-
-    customerStatus.className =
-      "status stopped";
-  }
-
-
-  if (driverAppEnabled) {
-
-    driverStatus.textContent =
-      "التطبيق يعمل";
-
-    driverStatus.className =
-      "status active";
-
-  } else {
-
-    driverStatus.textContent =
-      "التطبيق متوقف";
-
-    driverStatus.className =
-      "status stopped";
-  }
+  box.style.color =
+    error ? "#dc3545" : "#198754";
 }
 
 
-function stopCustomerApp() {
-
-  if (!confirm("هل تريد إيقاف تطبيق العملاء؟"))
-    return;
-
-  customerAppEnabled = false;
-
-  localStorage.setItem(
-    "customerAppEnabled",
-    "false"
-  );
-
-  updateStatus();
-}
-
-
-function startCustomerApp() {
-
-  customerAppEnabled = true;
-
-  localStorage.setItem(
-    "customerAppEnabled",
-    "true"
-  );
-
-  updateStatus();
-}
-
-
-function stopDriverApp() {
-
-  if (!confirm("هل تريد إيقاف تطبيق التوصيل؟"))
-    return;
-
-  driverAppEnabled = false;
-
-  localStorage.setItem(
-    "driverAppEnabled",
-    "false"
-  );
-
-  updateStatus();
-}
-
-
-function startDriverApp() {
-
-  driverAppEnabled = true;
-
-  localStorage.setItem(
-    "driverAppEnabled",
-    "true"
-  );
-
-  updateStatus();
-}
-
-
-let blockedCustomers =
-  JSON.parse(
-    localStorage.getItem("blockedCustomers") || "[]"
-  );
-
-
-let blockedDrivers =
-  JSON.parse(
-    localStorage.getItem("blockedDrivers") || "[]"
-  );
-
-
-function blockCustomer() {
-
-  const name =
-    document.getElementById("customerName")
-    .value.trim();
-
-  const reason =
-    document.getElementById("customerReason")
-    .value.trim();
-
-  if (!name) {
-    alert("اكتب اسم العميل أو رقم الجوال");
-    return;
-  }
-
-  blockedCustomers.push({
-    name: name,
-    reason: reason || "غير محدد",
-    date: new Date().toLocaleString("ar-SA")
-  });
-
-  localStorage.setItem(
-    "blockedCustomers",
-    JSON.stringify(blockedCustomers)
-  );
-
-  document.getElementById("customerName").value = "";
-  document.getElementById("customerReason").value = "";
-
-  renderCustomers();
-}
-
-
-function unblockCustomer(index) {
-
-  blockedCustomers.splice(index, 1);
-
-  localStorage.setItem(
-    "blockedCustomers",
-    JSON.stringify(blockedCustomers)
-  );
-
-  renderCustomers();
-}
-
-
-function renderCustomers() {
+async function loadProducts() {
 
   const box =
-    document.getElementById("customersList");
+    document.getElementById("productsBox");
 
-  box.innerHTML = "";
+  box.innerHTML =
+    "جاري تحميل المنتجات...";
 
-  blockedCustomers.forEach((customer, index) => {
+  try {
 
-    box.innerHTML += `
-      <div class="person">
-        <strong>${customer.name}</strong><br>
-        الحالة: موقوف<br>
-        السبب: ${customer.reason}<br>
-        التاريخ: ${customer.date}<br>
+    const response =
+      await fetch(API_BASE);
 
-        <button
-          class="unblock-btn"
-          onclick="unblockCustomer(${index})">
-          إعادة تفعيل العميل
-        </button>
-      </div>
-    `;
-  });
+    if (!response.ok) {
+      throw new Error(
+        "HTTP " + response.status
+      );
+    }
+
+    const data =
+      await response.json();
+
+    let products = [];
+
+    if (Array.isArray(data)) {
+
+      products = data;
+
+    } else if (
+      data &&
+      Array.isArray(data.products)
+    ) {
+
+      products = data.products;
+
+    } else if (
+      data &&
+      Array.isArray(data.data)
+    ) {
+
+      products = data.data;
+    }
+
+
+    if (!products.length) {
+
+      box.innerHTML =
+        '<div class="empty">لا توجد منتجات حاليًا</div>';
+
+      return;
+    }
+
+
+    box.innerHTML = "";
+
+
+    products.forEach((product, index) => {
+
+      const id =
+        product.id ||
+        product._id ||
+        product.number ||
+        index;
+
+
+      const card =
+        document.createElement("div");
+
+      card.className = "product";
+
+
+      card.innerHTML = `
+        <h3>
+          ${escapeHtml(
+            product.name ||
+            product.productName ||
+            "بدون اسم"
+          )}
+        </h3>
+
+        <p>
+          التصنيف:
+          ${escapeHtml(
+            product.category || "-"
+          )}
+        </p>
+
+        <p>
+          رقم الرأس:
+          ${escapeHtml(
+            product.number ||
+            product.productNumber ||
+            "-"
+          )}
+        </p>
+
+        <p>
+          السعر:
+          <strong>
+            ${escapeHtml(
+              product.price || 0
+            )} ريال
+          </strong>
+        </p>
+
+        <p>
+          المخزون:
+          ${escapeHtml(
+            product.stock ?? 1
+          )}
+        </p>
+
+        <span class="status">
+          متاح
+        </span>
+
+        <div class="actions">
+
+          <button
+            class="btn-edit"
+            onclick='editProduct(
+              ${JSON.stringify(id)},
+              ${JSON.stringify(
+                product.name ||
+                product.productName ||
+                ""
+              )},
+              ${JSON.stringify(
+                product.price || 0
+              )}
+            )'
+          >
+            تعديل
+          </button>
+
+          <button
+            class="btn-delete"
+            onclick='deleteProduct(
+              ${JSON.stringify(id)}
+            )'
+          >
+            حذف
+          </button>
+
+        </div>
+      `;
+
+
+      box.appendChild(card);
+
+    });
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    box.innerHTML =
+      '<div class="empty">تعذر تحميل المنتجات من الخادم</div>';
+  }
 }
 
 
-function blockDriver() {
+
+async function addProduct() {
 
   const name =
-    document.getElementById("driverName")
-    .value.trim();
+    document
+      .getElementById("productName")
+      .value
+      .trim();
 
-  const reason =
-    document.getElementById("driverReason")
-    .value.trim();
+  const category =
+    document
+      .getElementById("productCategory")
+      .value;
 
-  if (!name) {
-    alert("اكتب اسم السائق أو رقم الجوال");
+  const number =
+    document
+      .getElementById("productNumber")
+      .value
+      .trim();
+
+  const price =
+    document
+      .getElementById("productPrice")
+      .value;
+
+  const stock =
+    document
+      .getElementById("productStock")
+      .value;
+
+
+  if (
+    !name ||
+    !category ||
+    !number ||
+    !price
+  ) {
+
+    showMessage(
+      "أكمل جميع البيانات المطلوبة",
+      true
+    );
+
     return;
   }
 
-  blockedDrivers.push({
+
+  const product = {
+
+    action: "add",
+
     name: name,
-    reason: reason || "غير محدد",
-    date: new Date().toLocaleString("ar-SA")
-  });
 
-  localStorage.setItem(
-    "blockedDrivers",
-    JSON.stringify(blockedDrivers)
-  );
+    category: category,
 
-  document.getElementById("driverName").value = "";
-  document.getElementById("driverReason").value = "";
+    number: number,
 
-  renderDrivers();
+    price: Number(price),
+
+    stock: Number(stock || 1)
+
+  };
+
+
+  try {
+
+    showMessage(
+      "جاري إضافة المنتج..."
+    );
+
+
+    await fetch(API_BASE, {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "text/plain;charset=utf-8"
+      },
+
+      body:
+        JSON.stringify(product)
+
+    });
+
+
+    showMessage(
+      "تم إرسال المنتج بنجاح"
+    );
+
+
+    document
+      .getElementById("productName")
+      .value = "";
+
+    document
+      .getElementById("productCategory")
+      .value = "";
+
+    document
+      .getElementById("productNumber")
+      .value = "";
+
+    document
+      .getElementById("productPrice")
+      .value = "";
+
+    document
+      .getElementById("productStock")
+      .value = "1";
+
+
+    setTimeout(
+      loadProducts,
+      1000
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    showMessage(
+      "تعذر إضافة المنتج",
+      true
+    );
+  }
 }
 
 
-function unblockDriver(index) {
 
-  blockedDrivers.splice(index, 1);
+async function deleteProduct(id) {
 
-  localStorage.setItem(
-    "blockedDrivers",
-    JSON.stringify(blockedDrivers)
-  );
+  const ok =
+    confirm(
+      "هل تريد حذف هذا المنتج؟"
+    );
 
-  renderDrivers();
+  if (!ok) return;
+
+
+  try {
+
+    await fetch(API_BASE, {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "text/plain;charset=utf-8"
+      },
+
+      body:
+        JSON.stringify({
+          action: "delete",
+          id: id
+        })
+
+    });
+
+
+    showMessage(
+      "تم إرسال طلب الحذف"
+    );
+
+
+    setTimeout(
+      loadProducts,
+      1000
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    showMessage(
+      "تعذر حذف المنتج",
+      true
+    );
+  }
 }
 
 
-function renderDrivers() {
 
-  const box =
-    document.getElementById("driversList");
+async function editProduct(
+  id,
+  oldName,
+  oldPrice
+) {
 
-  box.innerHTML = "";
+  const name =
+    prompt(
+      "اسم المنتج",
+      oldName
+    );
 
-  blockedDrivers.forEach((driver, index) => {
+  if (name === null) return;
 
-    box.innerHTML += `
-      <div class="person">
-        <strong>${driver.name}</strong><br>
-        الحالة: موقوف<br>
-        السبب: ${driver.reason}<br>
-        التاريخ: ${driver.date}<br>
 
-        <button
-          class="unblock-btn"
-          onclick="unblockDriver(${index})">
-          إعادة تفعيل السائق
-        </button>
-      </div>
-    `;
-  });
+  const price =
+    prompt(
+      "السعر الجديد",
+      oldPrice
+    );
+
+  if (price === null) return;
+
+
+  try {
+
+    await fetch(API_BASE, {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "text/plain;charset=utf-8"
+      },
+
+      body:
+        JSON.stringify({
+
+          action: "edit",
+
+          id: id,
+
+          name: name,
+
+          price: Number(price)
+
+        })
+
+    });
+
+
+    showMessage(
+      "تم إرسال التعديل"
+    );
+
+
+    setTimeout(
+      loadProducts,
+      1000
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    showMessage(
+      "تعذر تعديل المنتج",
+      true
+    );
+  }
 }
 
 
-updateStatus();
-renderCustomers();
-renderDrivers();
+
+function escapeHtml(value) {
+
+  return String(value)
+
+    .replaceAll("&", "&amp;")
+
+    .replaceAll("<", "&lt;")
+
+    .replaceAll(">", "&gt;")
+
+    .replaceAll('"', "&quot;")
+
+    .replaceAll("'", "&#039;");
+}
+
+
+
+loadProducts();
 
 </script>
 
